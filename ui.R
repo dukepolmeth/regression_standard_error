@@ -16,16 +16,17 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       actionButton("do", "Generate new data"),
-      sliderInput("rseed", "Random Seed:",
-                  min=1, max=100, value=1),
-      actionButton("sample", "Pick a new sample")
+      actionButton("sample", "Pick a new sample"),
+      textOutput("equation")
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
       plotOutput("scatter"),
-      tableOutput("values"),
-      tableOutput("sample_idx")
+      plotOutput("histogram"),
+      # tableOutput("values"),
+      # tableOutput("sample_idx"),
+      tableOutput("model")
     )
   )
 ))
