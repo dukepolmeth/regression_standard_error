@@ -15,7 +15,7 @@ f_gen_data <- function(n) {
 }
 
 beta <- vector("numeric")
-
+nsims <- 0
 shinyServer(function(input, output, session) {
   n <- 100
 
@@ -29,24 +29,30 @@ shinyServer(function(input, output, session) {
 
   output$values <- renderTable(gen_data())
   output$sample_idx <- renderTable(data.frame(sample_ID = gen_sample()))
+  output$nsims <- renderText({
+    gen_sample()
+    nsims <<- nsims + 1
+    paste0("Number of sample simulations: ", nsims)
+  })
 
-  output$model <- renderTable({
+  output$beta <- renderText({
     data <- gen_data()
     my_sample <- data[gen_sample(), ]
 
     m <- lm(y ~ x, my_sample)
     beta[length(beta)+1] <<- coef(m)["x"]
-    data.frame(beta)
+    paste0("Beta values, one from each sample: ", paste0(format(beta, digits = 2), collapse = ", "))
   })
 
   output$scatter <- renderPlot({
     data <- gen_data()
     my_sample <- data[gen_sample(), ]
 
-    base_plot <- ggplot(data = data, aes(x, y)) + geom_point() +
-      geom_point(data = my_sample, color = "red") +
+    base_plot <- ggplot(data = data, aes(x, y)) + geom_point(alpha = 0.4) +
+      geom_point(data = my_sample, color = "red", size = 3) +
       geom_smooth(data = my_sample, method = "lm") +
-      coord_cartesian(xlim = c(-3, 3), ylim = c(-7, 7))
+      coord_cartesian(xlim = c(-3, 3), ylim = c(-7, 7)) +
+      labs(title = "The regression model of y against x")
     print(base_plot)
   })
 
@@ -54,7 +60,8 @@ shinyServer(function(input, output, session) {
     gen_sample()
     hist <- ggplot(data = data.frame(beta)) +
       geom_histogram(aes(x = beta), binwidth = 0.2) +
-      coord_cartesian(xlim = c(0, 4))
+      coord_cartesian(xlim = c(0, 4)) +
+      labs(title = "The sampling distribution of beta")
     print(hist)
   })
 
@@ -66,6 +73,6 @@ shinyServer(function(input, output, session) {
     l <- list(a = format(coef(m)[1], digits = 2),
               b = format(abs(coef(m)[2]), digits = 2),
               r2 = format(summary(m)$r.squared, digits = 3))
-    paste0("y = ", l$a, " + ", l$b, "* x")
+    paste0("Estimated Equation: y = ", l$a, " + ", l$b, "* x")
   })
 })

@@ -2,8 +2,8 @@ name: regression_standard_error
 account: ladilettante
 server: shinyapps.io
 appId: 127322
-bundleId: 565935
+bundleId: 566511
 url: https://ladilettante.shinyapps.io/regression_standard_error/
-when: 1474610191.63348
+when: 1474651958.6597
 asMultiple: FALSE
 asStatic: FALSE
